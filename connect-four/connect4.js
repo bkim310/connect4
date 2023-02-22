@@ -19,29 +19,29 @@ function makeBoard() {
   // TODO: set "board" to empty HEIGHT x WIDTH matrix array\
   for (let y = 0; y < HEIGHT; y++) {
     //looping over the height (6 times)
-    board.push(Array.from({ length: WIDTH })); //create 6x7 board
+    board.push(Array.from({ length: WIDTH })); //create 6x7 board looping the width(7 times) by the height (6 times)
   }
-  console.log(board);
 }
 
 /** makeHtmlBoard: make HTML table and row of column tops. */
 
 function makeHtmlBoard() {
   // TODO: get "htmlBoard" variable from the item in HTML w/ID of "board"
-  const htmlBoard = document.querySelector("#board");
+  const htmlBoard = document.getElementById("board");
 
   // TODO: add comment for this code
 
   //This will be to allow us an area to click to add a piece to the board
-  const top = document.createElement("tr"); //create a table row
+  //The top of the board where we choose where to click to add a piece
+  const top = document.createElement("tr"); //create a table row and set it to variable top
   top.setAttribute("id", "column-top"); //give that table row id "column-top"
-  top.addEventListener("click", handleClick); //when we click on that table row, do the handleClick function
+  top.addEventListener("click", handleClick); //when we click on that table row, do the handleClick function (which will drop a piece)
 
   for (let x = 0; x < WIDTH; x++) {
     //looping through the width of the board (7 times)
     const headCell = document.createElement("td"); //create table data cell
-    headCell.setAttribute("id", x); //set the id to "x"
-    top.append(headCell); //append the table data cell to the table row that we created
+    headCell.setAttribute("id", x); //set the id to the iteration of the loop we are on (0-6)
+    top.append(headCell); //append the table data cell to the table row that we created (the one we click on to play pieces)
   }
   htmlBoard.append(top); //append the table row to the board that we created
 
@@ -65,7 +65,10 @@ function makeHtmlBoard() {
 function findSpotForCol(x) {
   // TODO: write the real version of this, rather than always returning 0
   //run a loop over the height and check if the board coordinate is occupied
+  //checking from the top of the board to the bottom
+  //where we click on the top row determines the x position, we are finding a valid y position to place the piece in
   //if it is not occupied, then we can place the piece on that y value
+  //if no spots available, null so we cannot place a piece
   for (let y = HEIGHT - 1; y >= 0; y--) {
     if (!board[y][x]) {
       return y;
@@ -78,9 +81,9 @@ function findSpotForCol(x) {
 
 function placeInTable(y, x) {
   // TODO: make a div and insert into correct table cell
-  const piece = document.createElement("div"); //create the div
+  const piece = document.createElement("div"); //create the div that will hold the piece
   piece.classList.add("piece"); //add class "piece"
-  piece.classList.add(`p${currPlayer}`); //add class for currPlayer (p1 or p2)
+  piece.classList.add(`p${currPlayer}`); //add class for currPlayer (p1 or p2) //for css we can determine which piece will be which color
 
   //need to append piece to the correct table cell now (get the table cell via the id we create in our makeBoard function)
   const spot = document.getElementById(`${y}-${x}`); //let the location be the id of the correct cell
@@ -102,7 +105,7 @@ function handleClick(evt) {
   let x = +evt.target.id;
 
   // get next spot in column (if none, ignore click)
-  //we dont know what find spot for col is for yet
+  //if there is no valid spot for a piece, then no piece gets placed
   let y = findSpotForCol(x);
   if (y === null) {
     return;
@@ -110,12 +113,13 @@ function handleClick(evt) {
 
   // place piece in board and add to HTML table
   // TODO: add line to update in-memory board
+  //need help with this
   board[y][x] = currPlayer;
   placeInTable(y, x);
 
   // check for win
   if (checkForWin()) {
-    return endGame(`Player ${currPlayer} won!`);
+    return endGame(`Player ${currPlayer} won!`); //player 1 or 2 won
   }
 
   // check for tie
@@ -145,6 +149,7 @@ function checkForWin() {
     //  - returns true if all are legal coordinates & all match currPlayer
     //don't really understand this code
     return cells.every(
+      //every piece must be within the coordinates of the board that we created?
       ([y, x]) =>
         y >= 0 &&
         y < HEIGHT &&
@@ -195,6 +200,6 @@ function checkForWin() {
     }
   }
 }
-
+//create the gameboard
 makeBoard();
 makeHtmlBoard();
